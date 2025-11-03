@@ -53,10 +53,18 @@ export interface ProgressionData {
   CrCode: string;
   DepName: string;
   DeptCode: string;
+  DeptID: string;
   AcYrNm: string;
+  AcYr: string;
+  YrOfAdm: string;
   SemName: string;
   SemID: string;
   SecName: string;
+  SecID: string;
+  PrID: string;
+  PrName: string;
+  CrID: string;
+  stustatus: string;
   FNa: string;
   LNa: string;
   Sex: string;
@@ -66,6 +74,8 @@ export interface ProgressionData {
   MotNa: string;
   CnAdMob: string;
   CnEmail: string;
+  CnAdL1: string;
+  CnAdL2: string;
   AplnNum: string;
   AdmNum: string;
   address: Address;

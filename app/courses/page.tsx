@@ -33,15 +33,15 @@ export default function CoursesPage() {
   const loadSubjects = async () => {
     try {
       const cachedContent = StorageService.getTeachingContentData();
-      if (cachedContent) {
+      if (cachedContent?.output?.data) {
         setSubjects(cachedContent.output.data);
         setLoading(false);
         return;
       }
 
       const loginData = StorageService.getLoginData();
-      const progression = loginData?.output.data.progressionData[0];
-      const student = loginData?.output.data.logindetails.Student[0];
+      const progression = loginData?.output?.data?.progressionData?.[0];
+      const student = loginData?.output?.data?.logindetails?.Student?.[0];
 
       if (!progression || !student) {
         throw new Error("No student data found");
@@ -58,8 +58,12 @@ export default function CoursesPage() {
         DeptID: progression.DeptID,
       });
 
-      StorageService.saveTeachingContentData(content);
-      setSubjects(content.output.data);
+      if (content?.output?.data) {
+        StorageService.saveTeachingContentData(content);
+        setSubjects(content.output.data);
+      } else {
+        throw new Error("Invalid teaching content response");
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load subjects");
     } finally {
@@ -74,8 +78,8 @@ export default function CoursesPage() {
 
     try {
       const loginData = StorageService.getLoginData();
-      const progression = loginData?.output.data.progressionData[0];
-      const student = loginData?.output.data.logindetails.Student[0];
+      const progression = loginData?.output?.data?.progressionData?.[0];
+      const student = loginData?.output?.data?.logindetails?.Student?.[0];
 
       if (!progression || !student) return;
 
@@ -91,7 +95,9 @@ export default function CoursesPage() {
         progression.DeptID
       );
 
-      setChapters(chapterList.output.data);
+      if (chapterList?.output?.data) {
+        setChapters(chapterList.output.data);
+      }
     } catch (err) {
       console.error("Failed to load chapters:", err);
     } finally {
@@ -110,7 +116,9 @@ export default function CoursesPage() {
         chapter.SubChapID
       );
 
-      setSelectedChapter(content.output.data);
+      if (content?.output?.data) {
+        setSelectedChapter(content.output.data);
+      }
     } catch (err) {
       console.error("Failed to load chapter content:", err);
     } finally {

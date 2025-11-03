@@ -127,18 +127,45 @@ export class ApiService {
 
   // Get timetable
   static async getTimetable(params: {
-    InId: string;
+    InId?: string;
     PrID: string;
     CrID: string;
     DeptID: string;
     AcYr: string;
     SemID: string;
     SecID: string;
+    start?: string;
+    end?: string;
+    schdlTyp?: string;
+    isShowCancelledPeriod?: boolean;
+    isFromTt?: boolean;
   }): Promise<TimetableResponse> {
+    // Calculate current week's start and end dates if not provided
+    const today = new Date();
+    const dayOfWeek = today.getDay();
+    const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek; // If Sunday, go back 6 days, else go to Monday
+    const startDate = new Date(today);
+    startDate.setDate(today.getDate() + mondayOffset);
+    const endDate = new Date(startDate);
+    endDate.setDate(startDate.getDate() + 6);
+
+    // Build request body without InId (API doesn't expect it)
+    const { InId, ...paramsWithoutInId } = params;
+    const requestBody = {
+      ...paramsWithoutInId,
+      start: params.start || startDate.toISOString().split('T')[0],
+      end: params.end || endDate.toISOString().split('T')[0],
+      schdlTyp: params.schdlTyp || "showCurWeek",
+      isShowCancelledPeriod: params.isShowCancelledPeriod ?? true,
+      isFromTt: params.isFromTt ?? true,
+    };
+
+    console.log("Timetable API request body:", requestBody);
+
     const response = await fetch(`${PROXY_URL}?endpoint=/api/Timetable/get`, {
       method: "POST",
       headers: this.getHeaders(),
-      body: JSON.stringify(params),
+      body: JSON.stringify(requestBody),
     });
 
     if (!response.ok) {

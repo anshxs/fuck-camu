@@ -68,6 +68,29 @@ export default function LoginPage() {
           }
         }
 
+        // Step 5: Get Timetable Data
+        try {
+          const timetableParams = {
+            InId: progressionData[0].InId,
+            PrID: progressionData[0].PrID,
+            CrID: progressionData[0].CrID,
+            DeptID: progressionData[0].DeptID,
+            AcYr: progressionData[0].AcYr || progressionData[0]._id, // Try AcYr first, fallback to _id
+            SemID: progressionData[0].SemID,
+            SecID: progressionData[0].SecID,
+          };
+          
+          console.log("Fetching timetable with params:", timetableParams);
+          console.log("Full progression data:", progressionData[0]);
+          
+          const timetableData = await ApiService.getTimetable(timetableParams);
+          console.log("Timetable Data:", timetableData);
+          StorageService.saveTimetableData(timetableData);
+        } catch (ttErr) {
+          console.error("Failed to fetch timetable:", ttErr);
+          // Continue even if timetable fails
+        }
+
         // Redirect to dashboard
         router.push("/dashboard");
       } else {

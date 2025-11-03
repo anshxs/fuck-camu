@@ -180,7 +180,19 @@ export default function DashboardPage() {
         <div className="bg-white rounded-xl shadow-md p-6 mb-6">
           <div className="flex items-start space-x-6">
             <div className="shrink-0">
-              <div className="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center text-3xl font-bold text-blue-600">
+              {student.PhotoImgID ? (
+                <img
+                  src={`https://www.mycamu.co.in/image_attachment/get/${student.PhotoImgID}`}
+                  alt={`${student.FNa} ${student.LNa}`}
+                  className="w-24 h-24 rounded-full object-cover border-2 border-blue-200"
+                  onError={(e) => {
+                    // Fallback to initials if image fails to load
+                    e.currentTarget.style.display = 'none';
+                    e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                  }}
+                />
+              ) : null}
+              <div className={`w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center text-3xl font-bold text-blue-600 ${student.PhotoImgID ? 'hidden' : ''}`}>
                 {student.FNa.charAt(0)}
                 {student.LNa.charAt(0)}
               </div>

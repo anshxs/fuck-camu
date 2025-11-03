@@ -34,21 +34,26 @@ export default function TimetablePage() {
 
       // Fetch timetable from API
       const loginData = StorageService.getLoginData();
-      const progression = loginData?.output.data.progressionData[0];
+      const progression = loginData?.output?.data?.progressionData?.[0];
 
       if (!progression) {
         throw new Error("No progression data found");
       }
 
-      const timetable = await ApiService.getTimetable({
+      const timetableParams = {
         InId: progression.InId,
         PrID: progression.PrID,
         CrID: progression.CrID,
         DeptID: progression.DeptID,
-        AcYr: progression.YrOfAdm,
+        AcYr: progression.AcYr || progression._id, // Use AcYr field, fallback to _id
         SemID: progression.SemID,
         SecID: progression.SecID,
-      });
+      };
+
+      console.log("Fetching timetable with params:", timetableParams);
+      console.log("Progression data:", progression);
+
+      const timetable = await ApiService.getTimetable(timetableParams);
 
       StorageService.saveTimetableData(timetable);
       setTimetableData(timetable);
@@ -97,7 +102,30 @@ export default function TimetablePage() {
     );
   }
 
-  const timetableEntries = timetableData?.output.data[0] || [];
+  // Check if timetable data exists and has the expected structure
+  if (!timetableData?.output?.data) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-6 py-4 rounded-lg max-w-md">
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">⚠️</span>
+            <div>
+              <p className="font-semibold">No Timetable Data Available</p>
+              <p className="text-sm mt-1">Please try logging in again to fetch your timetable.</p>
+              <button
+                onClick={() => router.push("/dashboard")}
+                className="mt-3 px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition text-sm"
+              >
+                Back to Dashboard
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const timetableEntries = timetableData.output.data[0] || [];
   const groupedTimetable = groupByDay(timetableEntries);
 
   return (
